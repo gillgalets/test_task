@@ -1,0 +1,26 @@
+version: '3.7'
+
+services:
+  test_microservice:
+    build: ./test-microservice
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+    volumes:
+      - ./test-microservice/:/app/
+    ports:
+      - 8001:8000
+    environment:
+      - DATABASE_URI=postgresql://test_db_username:test_db_password@test_db/test_db_dev
+    depends_on:
+      - test_db
+
+  test_db:
+    image: postgres:12.1-alpine
+    volumes:
+      - postgres_data_test:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=test_db_username
+      - POSTGRES_PASSWORD=test_db_password
+      - POSTGRES_DB=test_db_dev
+
+volumes:
+  postgres_data_test:
